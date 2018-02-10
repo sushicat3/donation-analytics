@@ -11,12 +11,18 @@ readmeEx = [
 	'C00384516|N|M2|P|201702039042410894|15|IND|SABOURIN, JAMES|LOOKOUT MOUNTAIN|GA|028956146|UNUM|SVP, CORPORATE COMMUNICATIONS|01312018|384||PR2283904845050|1147350||P/R DEDUCTION ($192.00 BI-WEEKLY)|4020820171370029339'
 ]
 
+print('------------------------------------')
+print('testing stream processor:')
+
 for line in readmeEx:
 	relativeFields = donationAnalytics.extractRelevantFields(line)
 	print(relativeFields)
+	if relativeFields != None:
+		amounts = donationAnalytics.proccessContribution(relativeFields[0], relativeFields[1], relativeFields[2], relativeFields[3], relativeFields[4])
+		print(amounts)
 
-
-print('amonts')
+print('------------------------------------')
+print('Validating two . precision:')
 print(donationAnalytics.amountValid('2222.22'))
 print(donationAnalytics.amountValid('22fdsafds22.22'))
 print(donationAnalytics.amountValid('2324324324324324222.22'))
