@@ -1,3 +1,5 @@
+import re
+
 """
 	CMTE_ID				01	alphanumeric
 	NAME				08  alpha dashes spaces and commas
@@ -22,9 +24,33 @@ def extractRelevantFields(record):
 		relevantFields.append(records[15])
 		
 	return relevantFields
+
+
 	
 def validate(relevantFields):
-	pass
+	
+	# if cmteValid(relevantFields[0]):
+	# 	return relevantFields
+	# # if relevantFields[1] == 
+	# # if relevantFields[2] == 
+	# # if relevantFields[3] == 
+	# # if relevantFields[4] == 
+	if relevantFields[5] != '':
+		return False
+
+	if cmteValid(relevantFields[0]) == False:
+		return False
+	# else:
+	# 	return []
+	return True
+
+def cmteValid(cmte):
+	cmteValidator = re.compile('[a-zA-Z0-9]+')
+	cmteMatch = cmteValidator.match(cmte)
+	if cmteMatch != None and len(cmte) == cmteMatch.end():
+		return True
+	else:
+		return False
 
 def proccessContribution(fields):
 	"""

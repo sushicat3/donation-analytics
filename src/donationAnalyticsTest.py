@@ -12,4 +12,5 @@ readmeEx = [
 ]
 
 for line in readmeEx:
-	print(donationAnalytics.extractRelevantFields(line))
+	relativeFields = donationAnalytics.extractRelevantFields(line)
+	print(donationAnalytics.validate(relativeFields))
