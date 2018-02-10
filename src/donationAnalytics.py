@@ -45,6 +45,9 @@ def validate(relevantFields):
 	if dateValid(relevantFields[3]) == False:
 		return False
 
+	if amountValid(relevantFields[4]) == False:
+		return False
+
 	return True
 
 def cmteValid(cmte):
@@ -93,6 +96,15 @@ def dateValid(date):
 
 	return False
 
+
+def amountValid(amount):
+	if len(amount) <= 14:
+		amountValidator = re.compile('[0-9]+(\.[0-9][0-9]?)?')
+		amountMatch = amountValidator.match(amount)
+		if amountMatch != None and len(amount) == amountMatch.end():
+			return True
+
+	return False
 
 def proccessContribution(fields):
 	"""
