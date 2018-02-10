@@ -22,6 +22,9 @@ for line in readmeEx:
 		if emit != None:
 			print(emit)
 
+print(donationAnalytics.DONOR)
+print(donationAnalytics.RECIPIENT_AREA_YEAR)
+
 print('------------------------------------')
 print('Validating two . precision:')
 print(donationAnalytics.amountValid('2222.22'))
@@ -39,4 +42,29 @@ print(donationAnalytics.rounder(7.99))
 print(donationAnalytics.rounder(7.09))
 print(donationAnalytics.rounder(.50))
 
+print('------------------------------------')
+print('test nameValid:')
+print(donationAnalytics.nameValid('B_2(*-Bhatt, Swetal'))
+print(donationAnalytics.nameValid('B3920q-Bhatt, Swetal'))
+print(donationAnalytics.nameValid('Bhatt-Bhatt, Swetal'))
+
+print('------------------------------------')
+print('test zipValid:')
+print(donationAnalytics.zipValid('2'))
+print(donationAnalytics.zipValid('2432'))
+print(donationAnalytics.zipValid('fdsafdsa'))
+print(donationAnalytics.zipValid('12334'))
+print(donationAnalytics.zipValid('212332323'))
+
+print('------------------------------------')
+print('test cmteValid:')
+print(donationAnalytics.cmteValid('kfjdsa8329f32qdsFDSF'))
+
+print('------------------------------------')
+print('test dateValid:')
+print(donationAnalytics.dateValid('01014444'))
+print(donationAnalytics.dateValid('65012018'))
+print(donationAnalytics.dateValid('01782018'))
+print(donationAnalytics.dateValid('02292018'))
+print(donationAnalytics.dateValid('01012018'))
 
