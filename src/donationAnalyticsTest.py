@@ -16,10 +16,11 @@ print('testing stream processor:')
 
 for line in readmeEx:
 	relativeFields = donationAnalytics.extractRelevantFields(line)
-	print(relativeFields)
+	# print(relativeFields)
 	if relativeFields != None:
-		amounts = donationAnalytics.proccessContribution(relativeFields[0], relativeFields[1], relativeFields[2], relativeFields[3], relativeFields[4])
-		print(amounts)
+		emit = donationAnalytics.proccessContribution(relativeFields[0], relativeFields[1], relativeFields[2], relativeFields[3], relativeFields[4])
+		if emit != None:
+			print(emit)
 
 print('------------------------------------')
 print('Validating two . precision:')
@@ -30,3 +31,12 @@ print(donationAnalytics.amountValid('224322.22343'))
 print(donationAnalytics.amountValid('2222.2'))
 print(donationAnalytics.amountValid('2222.'))
 print(donationAnalytics.amountValid('484'))
+
+print('------------------------------------')
+print('test round:')
+
+print(donationAnalytics.rounder(7.99))
+print(donationAnalytics.rounder(7.09))
+print(donationAnalytics.rounder(.50))
+
+

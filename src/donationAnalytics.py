@@ -1,5 +1,6 @@
 import re
 import datetime
+import math
 
 """
 	CMTE_ID				01	alphanumeric
@@ -9,6 +10,8 @@ import datetime
 	TRANSACTION_AMT 	15	up to 2 decimal places
 	OTHER_ID			16	null
 """
+
+P = 30
 
 def extractRelevantFields(record):
 	"""
@@ -151,8 +154,8 @@ def proccessContribution(recipient, donor, zipcode, year, amount):
 				amounts = proccessRepeatDonor(recipient, zipcode, year, amount)
 				if amounts != None:
 					# we can calculate and emit data
-					emit(recipient, zipcode, year, amounts)
-				return(amounts)
+					e = emit(recipient, zipcode, year, amounts)
+					return(e)
 	else:
 		# this is a new donor
 		# add to the hashmap
@@ -162,7 +165,7 @@ def proccessContribution(recipient, donor, zipcode, year, amount):
 
 def proccessRepeatDonor(recipient, zipcode, year, amount):
 	k = recipient + '|' + zipcode + '|' + year
-	v = amount
+	v = float(amount)
 	if k in RECIPIENT_AREA_YEAR:
 		# there are already some repeat donors for this RECIPIENT, AREA and YEAR
 		# append the value
@@ -176,4 +179,19 @@ def proccessRepeatDonor(recipient, zipcode, year, amount):
 
 
 def emit(recipient, zipcode, year, amounts):
-	pass
+	perc = rounder(percentile(amounts))
+	totalamount = rounder(sum(amounts))
+	matches = len(amounts)
+	emit = recipient + '|' + zipcode + '|' + year + '|' + str(perc) + '|' + str(totalamount) + '|' + str(matches)
+	return(emit)
+
+def percentile(amounts):
+	ordinal = int(math.ceil((P / 100.0) * len(amounts)))
+	return amounts[ordinal-1]
+
+def rounder(number):
+	upper = math.ceil(number)
+	if upper - number <= 0.5:
+		return int(upper)
+	else:
+		return int(upper - 1)
