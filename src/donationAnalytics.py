@@ -38,6 +38,9 @@ def validate(relevantFields):
 	if nameValid(relevantFields[1]) == False:
 		return False
 
+	if zipValid(relevantFields[2]) == False:
+		return False
+
 	return True
 
 def cmteValid(cmte):
@@ -53,6 +56,14 @@ def nameValid(name):
 	nameValidator = re.compile('[a-zA-Z, -]+')
 	nameMatch = nameValidator.match(name)
 	if nameMatch != None and len(name) == nameMatch.end():
+		return True
+	else:
+		return False
+
+def zipValid(zipcode):
+	zipValidator = re.compile('[0-9]{5,9}')
+	zipMatch = zipValidator.match(zipcode)
+	if zipMatch != None and len(zipcode) == zipMatch.end():
 		return True
 	else:
 		return False
