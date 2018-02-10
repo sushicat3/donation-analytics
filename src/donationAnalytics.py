@@ -1,4 +1,5 @@
 import re
+import datetime
 
 """
 	CMTE_ID				01	alphanumeric
@@ -41,6 +42,9 @@ def validate(relevantFields):
 	if zipValid(relevantFields[2]) == False:
 		return False
 
+	if dateValid(relevantFields[3]) == False:
+		return False
+
 	return True
 
 def cmteValid(cmte):
@@ -48,8 +52,8 @@ def cmteValid(cmte):
 	cmteMatch = cmteValidator.match(cmte)
 	if cmteMatch != None and len(cmte) == cmteMatch.end():
 		return True
-	else:
-		return False
+
+	return False
 
 
 def nameValid(name):
@@ -57,16 +61,38 @@ def nameValid(name):
 	nameMatch = nameValidator.match(name)
 	if nameMatch != None and len(name) == nameMatch.end():
 		return True
-	else:
-		return False
+
+	return False
 
 def zipValid(zipcode):
 	zipValidator = re.compile('[0-9]{5,9}')
 	zipMatch = zipValidator.match(zipcode)
 	if zipMatch != None and len(zipcode) == zipMatch.end():
 		return True
-	else:
-		return False
+
+	return False
+
+
+def dateValid(date):
+	dateValidator = re.compile('[0-9]{8}')
+	dateMatch = dateValidator.match(date)
+	if dateMatch != None and len(date) == dateMatch.end():
+		
+		# validate using datetime
+		# no future dates
+		month = int(date[:2])
+		day = int(date[2:4])
+		year = int(date[4:8])
+		now = datetime.datetime.now()
+		try:
+			dateObject = datetime.datetime(year=year, month=month, day=day)
+			if dateObject <= now:
+				return True
+		except ValueError as e:
+			return False
+
+	return False
+
 
 def proccessContribution(fields):
 	"""
