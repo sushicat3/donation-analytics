@@ -29,25 +29,30 @@ def extractRelevantFields(record):
 	
 def validate(relevantFields):
 	
-	# if cmteValid(relevantFields[0]):
-	# 	return relevantFields
-	# # if relevantFields[1] == 
-	# # if relevantFields[2] == 
-	# # if relevantFields[3] == 
-	# # if relevantFields[4] == 
 	if relevantFields[5] != '':
 		return False
 
 	if cmteValid(relevantFields[0]) == False:
 		return False
-	# else:
-	# 	return []
+
+	if nameValid(relevantFields[1]) == False:
+		return False
+
 	return True
 
 def cmteValid(cmte):
 	cmteValidator = re.compile('[a-zA-Z0-9]+')
 	cmteMatch = cmteValidator.match(cmte)
 	if cmteMatch != None and len(cmte) == cmteMatch.end():
+		return True
+	else:
+		return False
+
+
+def nameValid(name):
+	nameValidator = re.compile('[a-zA-Z, -]+')
+	nameMatch = nameValidator.match(name)
+	if nameMatch != None and len(name) == nameMatch.end():
 		return True
 	else:
 		return False
