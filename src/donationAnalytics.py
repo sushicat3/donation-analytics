@@ -14,38 +14,47 @@ def extractRelevantFields(record):
 	"""
 		record: '|' delimited str with 21 values as described by FED data dictionary
 	"""
-	relevantFields = []
+	fields = []
 	records = record.split('|')
 	if len(records) == 21:
-		relevantFields.append(records[0])
-		relevantFields.append(records[7])
-		relevantFields.append(records[10])
-		relevantFields.append(records[13])
-		relevantFields.append(records[14])
-		relevantFields.append(records[15])
+		fields.append(records[0])
+		fields.append(records[7])
+		fields.append(records[10])
+		fields.append(records[13])
+		fields.append(records[14])
+		fields.append(records[15])
 		
-	return relevantFields
+	if validate(fields):
+		fields[2] = fields[2][:5]
+		fields.pop()
+	else:
+		return None
+	
+	return fields
 
 
 	
-def validate(relevantFields):
+def validate(fields):
+
+	if len(fields) != 6:
+		return False
 	
-	if relevantFields[5] != '':
+	if fields[5] != '':
 		return False
 
-	if cmteValid(relevantFields[0]) == False:
+	if cmteValid(fields[0]) == False:
 		return False
 
-	if nameValid(relevantFields[1]) == False:
+	if nameValid(fields[1]) == False:
 		return False
 
-	if zipValid(relevantFields[2]) == False:
+	if zipValid(fields[2]) == False:
 		return False
 
-	if dateValid(relevantFields[3]) == False:
+	if dateValid(fields[3]) == False:
 		return False
 
-	if amountValid(relevantFields[4]) == False:
+	if amountValid(fields[4]) == False:
 		return False
 
 	return True

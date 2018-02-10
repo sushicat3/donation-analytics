@@ -14,7 +14,6 @@ readmeEx = [
 for line in readmeEx:
 	relativeFields = donationAnalytics.extractRelevantFields(line)
 	print(relativeFields)
-	print(donationAnalytics.validate(relativeFields))
 
 
 print('amonts')
@@ -24,4 +23,4 @@ print(donationAnalytics.amountValid('2324324324324324222.22'))
 print(donationAnalytics.amountValid('224322.22343'))
 print(donationAnalytics.amountValid('2222.2'))
 print(donationAnalytics.amountValid('2222.'))
-print(donationAnalytics.amountValid('2222'))
+print(donationAnalytics.amountValid('484'))
