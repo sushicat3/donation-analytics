@@ -11,7 +11,24 @@ import math
 	OTHER_ID			16	null
 """
 
-P = 30
+P = None
+
+def streamfile(infile, outfile, pfile):
+	global P
+	with open(pfile, 'r') as pf:
+		percentile = pf.readline()
+		P = int(percentile)
+	
+	with open(infile, 'r') as inf:
+		with open(outfile, 'w') as outf:
+			for line in inf:
+				relativeFields = extractRelevantFields(line)
+				if relativeFields != None:
+					emit = proccessContribution(relativeFields[0], relativeFields[1], relativeFields[2], relativeFields[3], relativeFields[4])
+					if emit != None:
+						print(emit)
+						outf.write(emit + '\n')
+
 
 def extractRelevantFields(record):
 	"""
@@ -184,3 +201,12 @@ def rounder(number):
 		return int(upper)
 	else:
 		return int(upper - 1)
+
+def main():
+	infile = '../input/itcont.txt'
+	outfile = '../output/repeat_donors.txt'
+	pfile = '../input/percentile.txt'
+	streamfile(infile, outfile, pfile)
+
+if __name__ == '__main__':
+	main()

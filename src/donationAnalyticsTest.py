@@ -11,19 +11,19 @@ readmeEx = [
 	'C00384516|N|M2|P|201702039042410894|15|IND|SABOURIN, JAMES|LOOKOUT MOUNTAIN|GA|028956146|UNUM|SVP, CORPORATE COMMUNICATIONS|01312018|384||PR2283904845050|1147350||P/R DEDUCTION ($192.00 BI-WEEKLY)|4020820171370029339'
 ]
 
-print('------------------------------------')
-print('testing stream processor:')
+# print('------------------------------------')
+# print('testing stream processor:')
 
-for line in readmeEx:
-	relativeFields = donationAnalytics.extractRelevantFields(line)
-	# print(relativeFields)
-	if relativeFields != None:
-		emit = donationAnalytics.proccessContribution(relativeFields[0], relativeFields[1], relativeFields[2], relativeFields[3], relativeFields[4])
-		if emit != None:
-			print(emit)
+# for line in readmeEx:
+# 	relativeFields = donationAnalytics.extractRelevantFields(line)
+# 	# print(relativeFields)
+# 	if relativeFields != None:
+# 		emit = donationAnalytics.proccessContribution(relativeFields[0], relativeFields[1], relativeFields[2], relativeFields[3], relativeFields[4])
+# 		if emit != None:
+# 			print(emit)
 
-print(donationAnalytics.DONOR)
-print(donationAnalytics.RECIPIENT_AREA_YEAR)
+# print(donationAnalytics.DONOR)
+# print(donationAnalytics.RECIPIENT_AREA_YEAR)
 
 print('------------------------------------')
 print('Validating two . precision:')
@@ -68,3 +68,13 @@ print(donationAnalytics.dateValid('01782018'))
 print(donationAnalytics.dateValid('02292018'))
 print(donationAnalytics.dateValid('01012018'))
 
+
+print('------------------------------------')
+print('test io:')
+infile = '../input/itcont.txt'
+outfile = '../output/repeat_donors.txt'
+pfile = '../input/percentile.txt'
+donationAnalytics.streamfile(infile, outfile, pfile)
+
+print(donationAnalytics.DONOR)
+print(donationAnalytics.RECIPIENT_AREA_YEAR)
