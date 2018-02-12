@@ -1,6 +1,7 @@
 import re
 import datetime
 import math
+import bstree
 
 """
 	CMTE_ID				01	alphanumeric
@@ -92,7 +93,7 @@ def cmteValid(cmte):
 
 
 def nameValid(name):
-	return dataValid(name, '[a-zA-Z, -]+')
+	return dataValid(name, '[a-zA-Z, -\.]+')
 
 
 def zipValid(zipcode):
@@ -139,7 +140,8 @@ def dataValid(data, regex):
 
 # hash map for NAME|ZIP : YEAR (earlist year observed as repeat donor)
 DONOR = {}
-# hash map for CMTE_ID|ZIP_CODE|YEAR : [TRANSACTION_AMT, ...] (list of amounts observed from repeat donors)
+# hash map for CMTE_ID|ZIP_CODE|YEAR : BSTree (list of amounts observed from repeat donors)
+# ordered list of amounts implemented as binary search tree
 RECIPIENT_AREA_YEAR = {}
 
 def proccessContribution(recipient, donor, zipcode, year, amount):
@@ -175,25 +177,26 @@ def proccessRepeatDonor(recipient, zipcode, year, amount):
 	if k in RECIPIENT_AREA_YEAR:
 		# there are already some repeat donors for this RECIPIENT, AREA and YEAR
 		# append the value
-		RECIPIENT_AREA_YEAR[k].append(v)
+		RECIPIENT_AREA_YEAR[k].insert(v)
 	else:
 		# this is the first repeat donor for the given RECIPIENT, AREA and YEAR
-		RECIPIENT_AREA_YEAR[k] = [v]
+		RECIPIENT_AREA_YEAR[k] = bstree.BSTree()
+		RECIPIENT_AREA_YEAR[k].insert(v)
 
-	# the list of amounts for the given RECIPIENT, AREA and YEAR
+	# the BSTree of amounts for the given RECIPIENT, AREA and YEAR
 	return RECIPIENT_AREA_YEAR[k]
 
 
 def emit(recipient, zipcode, year, amounts):
 	perc = rounder(percentile(amounts))
-	totalamount = rounder(sum(amounts))
-	matches = len(amounts)
+	totalamount = rounder(amounts.total)
+	matches = amounts.size
 	emit = recipient + '|' + zipcode + '|' + year + '|' + str(perc) + '|' + str(totalamount) + '|' + str(matches)
 	return(emit)
 
 def percentile(amounts):
-	ordinal = int(math.ceil((P / 100.0) * len(amounts)))
-	return amounts[ordinal-1]
+	ordinal = int(math.ceil((P / 100.0) * amounts.size))
+	return amounts.findNth(ordinal)
 
 def rounder(number):
 	upper = math.ceil(number)
