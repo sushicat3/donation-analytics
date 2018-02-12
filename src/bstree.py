@@ -1,3 +1,19 @@
+"""
+	In order to calculate a percentile from the TRANSACTION_AMTs, they must be ordered.
+	A binary search tree removes need to sort.
+	Instead of sorting a list each time the percentile needs to be calculated (O(nlgn)),
+	and obtaining the nth element of the list (O(1)) 
+	the bst is updated each time a percentile needs to be calculated (worst case O(n))
+	and the nth element is obtained by traversing the tree (worst case O(n)) 
+
+	O(nlgn) --reduced to--> O(n)
+
+	The size and total value of the tree is also stored to omit the need for calculating
+	it later.
+
+	findNth() gets the nth element by travesing the bst in order.
+"""
+
 class Node:
 	def __init__(self, data):
 		self.left = None

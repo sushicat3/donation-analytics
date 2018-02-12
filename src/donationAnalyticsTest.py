@@ -1,5 +1,5 @@
 import donationAnalytics
-
+import validator
 
 readmeEx = [
 	'C00629618|N|TER|P|201701230300133512|15C|IND|PEREZ, JOHN A|LOS ANGELES|CA|90017|PRINCIPAL|DOUBLE NICKEL ADVISORS|01032017|40|H6CA34245|SA01251735122|1141239|||2012520171368850783',
@@ -27,13 +27,13 @@ readmeEx = [
 
 print('------------------------------------')
 print('Validating two . precision:')
-print(donationAnalytics.amountValid('2222.22'))
-print(donationAnalytics.amountValid('22fdsafds22.22'))
-print(donationAnalytics.amountValid('2324324324324324222.22'))
-print(donationAnalytics.amountValid('224322.22343'))
-print(donationAnalytics.amountValid('2222.2'))
-print(donationAnalytics.amountValid('2222.'))
-print(donationAnalytics.amountValid('484'))
+print(validator.amountValid('2222.22'))
+print(validator.amountValid('22fdsafds22.22'))
+print(validator.amountValid('2324324324324324222.22'))
+print(validator.amountValid('224322.22343'))
+print(validator.amountValid('2222.2'))
+print(validator.amountValid('2222.'))
+print(validator.amountValid('484'))
 
 print('------------------------------------')
 print('test round:')
@@ -44,29 +44,29 @@ print(donationAnalytics.rounder(.50))
 
 print('------------------------------------')
 print('test nameValid:')
-print(donationAnalytics.nameValid('B_2(*-Bhatt, Swetal'))
-print(donationAnalytics.nameValid('B3920q-Bhatt, Swetal'))
-print(donationAnalytics.nameValid('Bhatt-Bhatt, Swetal'))
+print(validator.nameValid('B_2(*-Bhatt, Swetal'))
+print(validator.nameValid('B3920q-Bhatt, Swetal'))
+print(validator.nameValid('Bhatt-Bhatt, Swetal'))
 
 print('------------------------------------')
 print('test zipValid:')
-print(donationAnalytics.zipValid('2'))
-print(donationAnalytics.zipValid('2432'))
-print(donationAnalytics.zipValid('fdsafdsa'))
-print(donationAnalytics.zipValid('12334'))
-print(donationAnalytics.zipValid('212332323'))
+print(validator.zipValid('2'))
+print(validator.zipValid('2432'))
+print(validator.zipValid('fdsafdsa'))
+print(validator.zipValid('12334'))
+print(validator.zipValid('212332323'))
 
 print('------------------------------------')
 print('test cmteValid:')
-print(donationAnalytics.cmteValid('kfjdsa8329f32qdsFDSF'))
+print(validator.cmteValid('kfjdsa8329f32qdsFDSF'))
 
 print('------------------------------------')
 print('test dateValid:')
-print(donationAnalytics.dateValid('01014444'))
-print(donationAnalytics.dateValid('65012018'))
-print(donationAnalytics.dateValid('01782018'))
-print(donationAnalytics.dateValid('02292018'))
-print(donationAnalytics.dateValid('01012018'))
+print(validator.dateValid('01014444'))
+print(validator.dateValid('65012018'))
+print(validator.dateValid('01782018'))
+print(validator.dateValid('02292018'))
+print(validator.dateValid('01012018'))
 
 
 print('------------------------------------')

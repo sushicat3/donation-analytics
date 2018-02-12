@@ -1,20 +1,24 @@
-import re
-import datetime
 import math
+import validator
 import bstree
 
-"""
-	CMTE_ID				01	alphanumeric
-	NAME				08  alpha dashes spaces and commas
-	ZIP_CODE			11	First 5
-	TRANSACTION_DT		14	MMDDYYYY
-	TRANSACTION_AMT 	15	up to 2 decimal places
-	OTHER_ID			16	null
-"""
 
+# Global variable for percentile
 P = None
 
+
 def streamfile(infile, outfile, pfile):
+	"""
+		Function for reading in input files, and processing itcont.txt like a stream.
+		For each line:
+			- first the "relevant fields" are extracted. These are the fields used to
+			  determine the reapeat donors and their contributions.
+			- then the "relevant fields" are "proccessed" to see if they contain
+			  information about a repeat donor. If they do, a line containing
+			  the output data is "emmited"
+			- the "emitted" line is written to the output file.
+
+	"""
 	global P
 	with open(pfile, 'r') as pf:
 		percentile = pf.readline()
@@ -34,8 +38,23 @@ def streamfile(infile, outfile, pfile):
 def extractRelevantFields(record):
 	"""
 		record: '|' delimited str with 21 values as described by FED data dictionary
+		
+		fields to check:
+			CMTE_ID				01	alphanumeric
+			NAME				08  alpha dashes spaces and commas
+			ZIP_CODE			11	First 5
+			TRANSACTION_DT		14	MMDDYYYY
+			TRANSACTION_AMT 	15	up to 2 decimal places
+			OTHER_ID			16	null
+
+		if those fields are validated...
+
+			returns (cmte, name, zipcode, year, amount)
+
+		otherwise this line can be skipped...
+			returns None
+
 	"""
-	fields = []
 	records = record.split('|')
 	if len(records) == 21:
 		cmte = records[0]
@@ -44,159 +63,111 @@ def extractRelevantFields(record):
 		date = records[13]
 		amount = records[14]
 		other = records[15]
-
-		fields.append(cmte)
-		fields.append(name)
-		fields.append(zipcode)
-		fields.append(date)
-		fields.append(amount)
-		fields.append(other)
 		
-		if validate(fields):
+		if validator.validate(cmte, name, zipcode, date, amount, other):
 			zipcode = zipcode[:5]
-			fields[2] = zipcode
 			year = date[4:8]
-			fields[3] = year
-			fields.pop()
 			return cmte, name, zipcode, year, amount
 
 	return None
-
 	
-def validate(fields):
 
-	if len(fields) != 6:
-		return False
-	
-	if fields[5] != '':
-		return False
+"""
+	hash map:
+		NAME|ZIP_CODE : YEAR
 
-	if cmteValid(fields[0]) == False:
-		return False
+	To quickly (O(1)) find if a donor is a repeat donor. If they are, they will
+	be in the hash map with an earlier year.
 
-	if nameValid(fields[1]) == False:
-		return False
-
-	if zipValid(fields[2]) == False:
-		return False
-
-	if dateValid(fields[3]) == False:
-		return False
-
-	if amountValid(fields[4]) == False:
-		return False
-
-	return True
-
-def cmteValid(cmte):
-	return dataValid(cmte, '[a-zA-Z0-9]+')
-
-
-def nameValid(name):
-	return dataValid(name, '[a-zA-Z, -\.]+')
-
-
-def zipValid(zipcode):
-	return dataValid(zipcode, '[0-9]{5,9}')
-
-
-def dateValid(date):
-	if dataValid(date, '[0-9]{8}'):
-		# validate using datetime for no invalid dates
-		# no future dates
-		month = int(date[:2])
-		day = int(date[2:4])
-		year = int(date[4:8])
-		now = datetime.datetime.now()
-		try:
-			dateObject = datetime.datetime(year=year, month=month, day=day)
-			if dateObject <= now:
-				return True
-		except ValueError as e:
-			return False
-
-	return False
-
-
-def amountValid(amount):
-	if len(amount) <= 14:
-		return dataValid(amount, '[0-9]+(\.[0-9][0-9]?)?')
-
-	return False
-
-
-def dataValid(data, regex):
-	"""
-		Initial Regex validation. 
-		Returns True if the regex matches the whole data string. 
-	"""
-	dataValidator = re.compile(regex)
-	dataMatch = dataValidator.match(data)
-	if dataMatch != None and len(data) == dataMatch.end():
-		return True
-
-	return False
-
-
-# hash map for NAME|ZIP : YEAR (earlist year observed as repeat donor)
+"""
 DONOR = {}
-# hash map for CMTE_ID|ZIP_CODE|YEAR : BSTree (list of amounts observed from repeat donors)
-# ordered list of amounts implemented as binary search tree
+
+
+"""
+	hash map:
+		CMTE_ID|ZIP_CODE|YEAR : BSTree(TRANSACTION_AMT)
+
+	To quickly (O(1)) find all amounts dontated by repeat donors in a particular 
+	zip code, during a particular year, to a particlar committee.
+
+"""
 RECIPIENT_AREA_YEAR = {}
 
+
 def proccessContribution(recipient, donor, zipcode, year, amount):
+	"""
+		Takes information from a new contribution, and determines if it
+		is from a repeat donor using the DONOR hashmap. If so, the percentile
+		is calculated.
+
+		returns output line with percentile if this is a repeat donor.
+		otherwise, returns None.
+
+	"""
 	k = donor + '|' + zipcode
 	v = year
 	if k in DONOR:
-		# if year is != to current(v), this is a repeat donor
 		if DONOR[k] != v:
-			# repeat donor!
-			# make sure in order, if not update
-			if DONOR[k] >= v:
+			if int(DONOR[k]) >= int(v):
+				# if not in order, update
 				DONOR[k] = v
-				# ignore this row if not in order
 			else:
-				# the year is in order and is after
-				# this is a repeat donor
-				# find out how much is being donated to this recipient from this area this year
 				amounts = proccessRepeatDonor(recipient, zipcode, year, amount)
-				if amounts != None:
-					# we can calculate and emit data
-					e = emit(recipient, zipcode, year, amounts)
-					return(e)
+				e = emit(recipient, zipcode, year, amounts)
+				return(e)
 	else:
-		# this is a new donor
-		# add to the hashmap
+		# new donor, add to the hashmap
 		DONOR[k] = v
 		return None
 
 
 def proccessRepeatDonor(recipient, zipcode, year, amount):
+	"""
+		Takes the contribution data about the repeat donor and uses it to obtain
+		all amounts dontated by repeat donors in a with that zip code, during that
+		particular year, to that particlar committee, (so they may be used to 
+		calculate the percentile)
+
+		returns the BSTree of TRANSACTION_AMTs for the given RECIPIENT, AREA and YEAR
+
+	"""
 	k = recipient + '|' + zipcode + '|' + year
 	v = float(amount)
 	if k in RECIPIENT_AREA_YEAR:
-		# there are already some repeat donors for this RECIPIENT, AREA and YEAR
-		# append the value
 		RECIPIENT_AREA_YEAR[k].insert(v)
 	else:
-		# this is the first repeat donor for the given RECIPIENT, AREA and YEAR
 		RECIPIENT_AREA_YEAR[k] = bstree.BSTree()
 		RECIPIENT_AREA_YEAR[k].insert(v)
-
-	# the BSTree of amounts for the given RECIPIENT, AREA and YEAR
+ 
 	return RECIPIENT_AREA_YEAR[k]
 
 
 def emit(recipient, zipcode, year, amounts):
+	"""
+		Calculates all the values in the output string:
+			recipient|zipcode|year|percentile|total amount|total contributions
+
+		the total amount is stored in the bst as "total"
+		the total contributions are stored in the bst as "size"
+	"""
 	perc = rounder(percentile(amounts))
 	totalamount = rounder(amounts.total)
 	matches = amounts.size
 	emit = recipient + '|' + zipcode + '|' + year + '|' + str(perc) + '|' + str(totalamount) + '|' + str(matches)
 	return(emit)
 
+
 def percentile(amounts):
+	"""
+		amounts: BSTree with all the amounts needed for percentile calculation.
+
+		Percentile calculation: ceil(P/100 * N) = n, where the nth element of an ordered 
+		list of N elements, is the Pth percentile.
+
+	"""
 	ordinal = int(math.ceil((P / 100.0) * amounts.size))
 	return amounts.findNth(ordinal)
+
 
 def rounder(number):
 	upper = math.ceil(number)
@@ -205,11 +176,13 @@ def rounder(number):
 	else:
 		return int(upper - 1)
 
+
 def main():
 	infile = '../input/itcont.txt'
 	outfile = '../output/repeat_donors.txt'
 	pfile = '../input/percentile.txt'
 	streamfile(infile, outfile, pfile)
+
 
 if __name__ == '__main__':
 	main()
