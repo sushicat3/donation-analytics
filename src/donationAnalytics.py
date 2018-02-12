@@ -1,6 +1,7 @@
 import math
 import validator
 import bstree
+import os.path
 
 
 # Global variable for percentile
@@ -31,7 +32,6 @@ def streamfile(infile, outfile, pfile):
 				if relativeFields != None:
 					emit = proccessContribution(relativeFields[0], relativeFields[1], relativeFields[2], relativeFields[3], relativeFields[4])
 					if emit != None:
-						print(emit)
 						outf.write(emit + '\n')
 
 
@@ -178,9 +178,10 @@ def rounder(number):
 
 
 def main():
-	infile = '../input/itcont.txt'
-	outfile = '../output/repeat_donors.txt'
-	pfile = '../input/percentile.txt'
+
+	infile = os.path.dirname(__file__) +'/../input/itcont.txt'
+	outfile = os.path.dirname(__file__) +'/../output/repeat_donors.txt'
+	pfile = os.path.dirname(__file__) +'/../input/percentile.txt'
 	streamfile(infile, outfile, pfile)
 
 

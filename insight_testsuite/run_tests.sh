@@ -11,12 +11,16 @@ GRADER_ROOT=$(dirname ${BASH_SOURCE})
 PROJECT_PATH=${GRADER_ROOT}/..
 
 function print_dir_contents {
+  echo -e "${color_blue}printing directory contents..."
+
   local proj_path=$1
   echo "Project contents:"
   echo -e "${color_blue}$(ls ${proj_path})${color_norm}"
 }
 
 function find_file_or_dir_in_project {
+  echo -e "${color_blue}finding file or dir in project..."
+
   local proj_path=$1
   local file_or_dir_name=$2
   if [[ ! -e "${proj_path}/${file_or_dir_name}" ]]; then
@@ -29,6 +33,8 @@ function find_file_or_dir_in_project {
 
 # check project directory structure
 function check_project_struct {
+  echo -e "${color_blue}checking project structure..."
+
   find_file_or_dir_in_project ${PROJECT_PATH} run.sh
   find_file_or_dir_in_project ${PROJECT_PATH} src
   find_file_or_dir_in_project ${PROJECT_PATH} input
@@ -37,6 +43,8 @@ function check_project_struct {
 
 # setup testing output folder
 function setup_testing_input_output {
+  echo -e "${color_blue}setting up testing input and output..."
+
   TEST_OUTPUT_PATH=${GRADER_ROOT}/temp
   if [ -d ${TEST_OUTPUT_PATH} ]; then
     rm -rf ${TEST_OUTPUT_PATH}
@@ -51,11 +59,14 @@ function setup_testing_input_output {
 
   rm -r ${TEST_OUTPUT_PATH}/input/*
   rm -r ${TEST_OUTPUT_PATH}/output/*
+
   cp -r ${GRADER_ROOT}/tests/${test_folder}/input/itcont.txt ${TEST_OUTPUT_PATH}/input/itcont.txt
   cp -r ${GRADER_ROOT}/tests/${test_folder}/input/percentile.txt ${TEST_OUTPUT_PATH}/input/percentile.txt
 }
 
 function compare_outputs {
+  echo -e "${color_blue}comparing outputs..."
+
   NUM_OUTPUT_FILES_PASSED=0
   OUTPUT_FILENAME=repeat_donors.txt
   PROJECT_ANSWER_PATH1=${GRADER_ROOT}/temp/output/${OUTPUT_FILENAME}
@@ -77,6 +88,8 @@ function compare_outputs {
 }
 
 function run_all_tests {
+  echo -e "${color_blue}running all tests..."
+
   TEST_FOLDERS=$(ls ${GRADER_ROOT}/tests)
   NUM_TESTS=$(($(echo $(echo ${TEST_FOLDERS} | wc -w))))
   PASS_CNT=0
